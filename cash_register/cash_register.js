@@ -22,21 +22,22 @@ $(document).ready(function(){
 
    $entries = $("#entries");
    $subTotal = $('#subtotal');
-
+   $salesTax = $('#salestax');
+    console.log("test")
   myUtils.myEach(line_items, function(v,i){
-    addItem(v.price, v.description, v.qty);
+    addItem(v.price, v.description.toLowerCase(), v.qty);
   });
 
   updateSubTotal();
-
+  updateSalesTax();
 
 });
 
 function addItem(price, title, quantity) {
-  // YUCK! Let's refactor this!
+  console.log("test")// YUCK! Let's refactor this!
   var html_string = (
         "<tr>" +
-          "<td>" +  title + "</td>" +
+          "<td>" +  title  + "</td>" +
           "<td>" + quantity + "</td>" +
           "<td>" + price + "</td>" +
         "</tr>"
@@ -45,7 +46,27 @@ function addItem(price, title, quantity) {
 }
 
 function updateSubTotal() {
-// Refactor this using our helper functions :D
-  var subTotalPrice = 0; // !! That won't do! Calculate the actual subtotal.
-  $subTotal.text("$" + price); 
+  var subTotalPrice =  myUtils.myReduce(line_items, cb, 0)
+  $subTotal.text("$" + subTotalPrice); 
 }
+  function cb(val, element){
+    return val + element.price
+}
+
+function compare(a, b) {
+  if (a.description.toLowerCase() < b.description.toLowerCase()) {
+    return -1;
+  }
+  if (a.description.toLowerCase() > b.description.toLowerCase()) {
+    return 1;
+  }
+  return 0;
+}
+
+function updateSalesTax() {
+  var subTotalPrice =  myUtils.myReduce(line_items, cb, 0)
+  $salesTax.text("$" + (subTotalPrice*0.0725))
+}
+
+
+line_items.sort(compare);
